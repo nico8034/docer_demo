@@ -14,7 +14,7 @@ on:
   # Environment Variables
 env:
   PACKAGE_REGISTRY_TO_USE: nico8034
-  DOCKER_IMAGE_NAME: lowercase-image-name
+  DOCKER_IMAGE_NAME: imagename
   PROJECT_NAME: ProjectName
   GROUP_NUMBER: GroupNumber #I.e  Group02
 
