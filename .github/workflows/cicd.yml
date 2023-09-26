@@ -13,11 +13,13 @@ on:
 
   # Environment Variables
 env:
+  SSH_USERNAME: nicol
   DOCKER_IMAGE_API: dotnet_api
   DOCKER_IMAGE_PUBLISHER: rust_publisher
   DOCKER_IMAGE_SUBSCRIBER: node_subscriber
   PROJECT_NAME: DemoProject
   GROUP_NUMBER: 1337 #I.e  Group02
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
 jobs:
   # Create artifact of repository source code to use for consistensy accross all jobs
@@ -189,5 +191,19 @@ jobs:
     needs: [build-push-api,build-push-publisher,build-push-subscriber]
     continue-on-error: true
     steps:
-      - name: Logic for deploying application
-        run: echo "deploy app"
+      - name: Download repository artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: repository-artifacts
+          path: .
+
+      - name: Transfer docker-compose to server
+        run: |
+          scp -o StrictHostKeyChecking=no -i <(echo "$SSH_PRIVATE_KEY") ./src/docker-compose.prod.yml ${{ env.SSH_USERNAME }}@${{ secrets.SERVER_IP }}:/deploy/
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Run docker-compose on VM
+        run: |
+          ssh -o StrictHostKeyChecking=no -i <(echo "$SSH_PRIVATE_KEY") ${{ env.SSH_USERNAME }}@${{ secrets.SERVER_IP }} "cd /deploy && docker-compose up -d"
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
