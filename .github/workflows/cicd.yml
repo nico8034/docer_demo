@@ -204,7 +204,7 @@ jobs:
 
       - name: Transfer docker-compose to server
         run: |
-          scp -o StrictHostKeyChecking=no -i private_key.pem ./src/docker-compose.prod.yml ${{ env.SSH_USERNAME }}@${{ secrets.SERVER_IP }}:/deploy/
+          scp -o StrictHostKeyChecking=no -i private_key.pem ./src/docker-compose.prod.yml ${{ env.SSH_USERNAME }}@${{ secrets.SERVER_IP }}:/deploy/docker-compose.prod.yml
 
       - name: Run docker-compose on VM
         run: |
