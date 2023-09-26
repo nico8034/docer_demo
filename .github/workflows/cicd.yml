@@ -95,101 +95,95 @@ jobs:
       - name: Test application
         run: echo "test"
 
-        ###
+  build-push-api:
+    runs-on: ubuntu-latest
+    needs: [test-application]
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Download repository artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: repository-artifacts
+          path: .
+      - name: Login to GitHub Package Registry
+        uses: docker/login-action@v2
+        with:
+          # Authenticate with GitHub Container Registry, could be changed to use DockerHub
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # Transform github.actor to lowercase
+      - name: Transform username to lowercase
+        run: echo "OWNER_LOWER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      # Building and pushing application image go to: GitHub -> Profile -> Packages 
+      - name: Build & Push image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./src/api #Path to your dockerfile
+          push: true
+          tags: ghcr.io/${{ env.OWNER_LOWER }}/${{ env.DOCKER_IMAGE_API }}:1.0-${{ github.sha }},ghcr.io/${{ env.OWNER_LOWER }}/${{ env.DOCKER_IMAGE_API }}:latest
 
-  # build-push-api:
-  #   runs-on: ubuntu-latest
-  #   needs: [test-application]
-  #   permissions:
-  #     packages: write
-  #     contents: read
-  #   steps:
-  #     - name: Download repository artifact
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: repository-artifacts
-  #         path: .
-  #     - name: Login to GitHub Package Registry
-  #       uses: docker/login-action@v2
-  #       with:
-  #         # Authenticate with GitHub Container Registry, could be changed to use DockerHub
-  #         registry: ghcr.io
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
-  #     # Transform github.actor to lowercase
-  #     - name: Transform username to lowercase
-  #       run: echo "OWNER_LOWER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-  #     # Building and pushing application image go to: GitHub -> Profile -> Packages 
-  #     - name: Build & Push image
-  #       uses: docker/build-push-action@v3
-  #       with:
-  #         context: ./src/api #Path to your dockerfile
-  #         push: true
-  #         tags: ghcr.io/${{ env.OWNER_LOWER }}/${{ env.DOCKER_IMAGE_API }}:1.0-${{ github.sha }},ghcr.io/${{ env.OWNER_LOWER }}/${{ env.DOCKER_IMAGE_API }}:latest
-
-  # build-push-publisher:
-  #   runs-on: ubuntu-latest
-  #   needs: [test-application]
-  #   permissions:
-  #     packages: write
-  #     contents: read
-  #   steps:
-  #     - name: Download repository artifact
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: repository-artifacts
-  #         path: .
-  #     - name: Login to GitHub Package Registry
-  #       uses: docker/login-action@v2
-  #       with:
-  #         # Authenticate with GitHub Container Registry, could be changed to use DockerHub
-  #         registry: ghcr.io
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
-  #     # Transform github.actor to lowercase
-  #     - name: Transform username to lowercase
-  #       run: echo "OWNER_LOWER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-  #     # Building and pushing application image go to: GitHub -> Profile -> Packages 
-  #     - name: Build & Push image
-  #       uses: docker/build-push-action@v3
-  #       with:
-  #         context: ./src/publisher #Path to your dockerfile
-  #         push: true
-  #         tags: ghcr.io/${{ env.OWNER_LOWER }}/${{ env.DOCKER_IMAGE_PUBLISHER }}:1.0-${{ github.sha }},ghcr.io/${{ env.OWNER_LOWER }}/${{ env.DOCKER_IMAGE_PUBLISHER }}:latest
+  build-push-publisher:
+    runs-on: ubuntu-latest
+    needs: [test-application]
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Download repository artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: repository-artifacts
+          path: .
+      - name: Login to GitHub Package Registry
+        uses: docker/login-action@v2
+        with:
+          # Authenticate with GitHub Container Registry, could be changed to use DockerHub
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # Transform github.actor to lowercase
+      - name: Transform username to lowercase
+        run: echo "OWNER_LOWER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      # Building and pushing application image go to: GitHub -> Profile -> Packages 
+      - name: Build & Push image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./src/publisher #Path to your dockerfile
+          push: true
+          tags: ghcr.io/${{ env.OWNER_LOWER }}/${{ env.DOCKER_IMAGE_PUBLISHER }}:1.0-${{ github.sha }},ghcr.io/${{ env.OWNER_LOWER }}/${{ env.DOCKER_IMAGE_PUBLISHER }}:latest
   
-  # build-push-subscriber:
-  #   runs-on: ubuntu-latest
-  #   needs: [test-application]
-  #   permissions:
-  #     packages: write
-  #     contents: read
-  #   steps:
-  #     - name: Download repository artifact
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: repository-artifacts
-  #         path: .
-  #     - name: Login to GitHub Package Registry
-  #       uses: docker/login-action@v2
-  #       with:
-  #         # Authenticate with GitHub Container Registry, could be changed to use DockerHub
-  #         registry: ghcr.io
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
-  #     # Transform github.actor to lowercase
-  #     - name: Transform username to lowercase
-  #       run: echo "OWNER_LOWER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-  #     # Building and pushing application image go to: GitHub -> Profile -> Packages 
-  #     - name: Build & Push image
-  #       uses: docker/build-push-action@v3
-  #       with:
-  #         context: ./src/subscriber #Path to your dockerfile
-  #         push: true
-  #         tags: ghcr.io/${{ env.OWNER_LOWER }}/${{ env.DOCKER_IMAGE_SUBSCRIBER }}:1.0-${{ github.sha }},ghcr.io/${{ env.OWNER_LOWER }}/${{ env.DOCKER_IMAGE_SUBSCRIBER }}:latest
-
-
-
-
+  build-push-subscriber:
+    runs-on: ubuntu-latest
+    needs: [test-application]
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Download repository artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: repository-artifacts
+          path: .
+      - name: Login to GitHub Package Registry
+        uses: docker/login-action@v2
+        with:
+          # Authenticate with GitHub Container Registry, could be changed to use DockerHub
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # Transform github.actor to lowercase
+      - name: Transform username to lowercase
+        run: echo "OWNER_LOWER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      # Building and pushing application image go to: GitHub -> Profile -> Packages 
+      - name: Build & Push image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./src/subscriber #Path to your dockerfile
+          push: true
+          tags: ghcr.io/${{ env.OWNER_LOWER }}/${{ env.DOCKER_IMAGE_SUBSCRIBER }}:1.0-${{ github.sha }},ghcr.io/${{ env.OWNER_LOWER }}/${{ env.DOCKER_IMAGE_SUBSCRIBER }}:latest
 
   # Job for deploying the application, could be the logic for deploying to your VM  
   deploy-application:

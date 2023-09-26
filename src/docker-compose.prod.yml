@@ -41,7 +41,9 @@ services:
   api:
     image: ghcr.io/nico8034/dotnet_api:latest
     ports:
-      - "8080:80"
+      - "80:80"
+    environment:
+      - ASPNETCORE_URLS=http://+:80
     depends_on:
       - postgres
 
