@@ -1,6 +1,7 @@
 version: '3'
 
 services:
+
   publisher:
     build:
       context: ./publisher
