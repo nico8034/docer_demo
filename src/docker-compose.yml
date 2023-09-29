@@ -1,6 +1,7 @@
 version: '3'
 
 services:
+
   publisher:
     build:
       context: ./publisher
@@ -52,6 +53,8 @@ services:
       - ASPNETCORE_URLS=http://+:80
     depends_on:
       - postgres
+
+      
 
 volumes:
   postgres_data:
