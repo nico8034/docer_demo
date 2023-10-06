@@ -36,6 +36,11 @@ jobs:
         with:
           name: repository-artifacts
           path: .
+      - name: Upload Docker Compose
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-compose
+          path: ./src
 
   # Perform linting and/or other static code analysis
   code-analysis:
@@ -195,7 +200,7 @@ jobs:
       - name: Download repository artifact
         uses: actions/download-artifact@v3
         with:
-          name: repository-artifacts
+          name: docker-compose
           path: .
 
       - name: Setup SSH Key
