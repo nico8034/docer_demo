@@ -192,7 +192,7 @@ jobs:
 
   # Job for deploying the application, could be the logic for deploying to your VM  
   deploy-application:
-    runs-on: [self-hosted, windows-2019] # Or another suitable Windows version
+    runs-on: [self-hosted]
     needs: clone-repository
     continue-on-error: true
     steps:
