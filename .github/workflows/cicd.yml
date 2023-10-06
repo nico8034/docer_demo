@@ -192,7 +192,8 @@ jobs:
 
   # Job for deploying the application, could be the logic for deploying to your VM  
   deploy-application:
-    runs-on: [self-hosted]
+    runs-on: self-hosted
+    # needs: [build-push-api,build-push-publisher,build-push-subscriber]
     needs: clone-repository
     continue-on-error: true
     steps:
@@ -202,30 +203,21 @@ jobs:
           name: docker-compose
           path: .
 
-      - name: Setup SSH Key
-        shell: powershell
-        run: |
-          "$env:SSH_PRIVATE_KEY" | Out-File -Encoding utf8 private_key.pem
+      # - name: Setup SSH Key
+      #   run: |
+      #     echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
 
       - name: Transfer docker-compose to server
-        shell: powershell
         run: |
-          scp -o StrictHostKeyChecking=no -i ./private_key.pem ./src/docker-compose.prod.yml $env:SSH_USERNAME@${{ secrets.SERVER_IP }}:./
-
+          scp -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} ./src/docker-compose.prod.yml ${{ env.SSH_USERNAME }}@${{ secrets.SERVER_IP }}:./
       - name: Transfer mosquitto config to server
-        shell: powershell
         run: |
-          scp -o StrictHostKeyChecking=no -i private_key.pem ./src/mosquitto.conf $env:SSH_USERNAME@${{ secrets.SERVER_IP }}:./
-
+          scp -o StrictHostKeyChecking=no -i private_key.pem ./src/mosquitto.conf ${{ env.SSH_USERNAME }}@${{ secrets.SERVER_IP }}:./
+        continue-on-error: true
       - name: Run docker-compose Down on VM
-        shell: powershell
         run: |
-          ssh -o StrictHostKeyChecking=no -i private_key.pem $env:SSH_USERNAME@${{ secrets.SERVER_IP }} "docker-compose -f docker-compose.prod.yml down"
-
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ env.SSH_USERNAME }}@${{ secrets.SERVER_IP }} "docker compose -f docker-compose.prod.yml down"
       - name: Run docker-compose --build up on VM
-        shell: powershell
         run: |
-          ssh -o StrictHostKeyChecking=no -i private_key.pem $env:SSH_USERNAME@${{ secrets.SERVER_IP }} "docker-compose -f docker-compose.prod.yml build --no-cache"
-          ssh -o StrictHostKeyChecking=no -i private_key.pem $env:SSH_USERNAME@${{ secrets.SERVER_IP }} "docker-compose -f docker-compose.prod.yml up -d"
-        env: 
-          SSH_USERNAME: ${{ secrets.SSH_USERNAME }} # Assuming you have this secret set up.
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ env.SSH_USERNAME }}@${{ secrets.SERVER_IP }} "docker compose -f docker-compose.prod.yml build --no-cache" &&
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ env.SSH_USERNAME }}@${{ secrets.SERVER_IP }} "docker compose -f docker-compose.prod.yml up -d"
