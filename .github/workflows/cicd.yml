@@ -203,13 +203,13 @@ jobs:
           name: docker-compose
           path: .
 
-      # - name: Setup SSH Key
-      #   run: |
-      #     echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+      - name: Setup SSH Key
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
 
       - name: Transfer docker-compose to server
         run: |
-          scp -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} ./src/docker-compose.prod.yml ${{ env.SSH_USERNAME }}@${{ secrets.SERVER_IP }}:./
+          scp -o StrictHostKeyChecking=no -i ./private_key.pem ./src/docker-compose.prod.yml ${{ env.SSH_USERNAME }}@${{ secrets.SERVER_IP }}:./
       - name: Transfer mosquitto config to server
         run: |
           scp -o StrictHostKeyChecking=no -i private_key.pem ./src/mosquitto.conf ${{ env.SSH_USERNAME }}@${{ secrets.SERVER_IP }}:./
