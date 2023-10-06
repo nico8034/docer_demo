@@ -204,9 +204,9 @@ jobs:
           path: .
 
       - name: Setup SSH Key
-        shell: powershell
         run: |
-          ${{ secrets.SSH_PRIVATE_KEY }} | Out-File -Encoding utf8 private_key.pem -Force
+          echo ${{ secrets.SSH_PRIVATE_KEY }} > private_key.pem
+          echo private_key.pem
 
       - name: Transfer docker-compose to server
         run: |
