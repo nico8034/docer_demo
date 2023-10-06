@@ -209,7 +209,7 @@ jobs:
 
       - name: Transfer docker-compose to server
         run: |
-          scp -o StrictHostKeyChecking=no -i private_key.pem ./src/docker-compose.prod.yml ${{ env.SSH_USERNAME }}@${{ secrets.SERVER_IP }}:./
+          scp -o StrictHostKeyChecking=no -i ./private_key.pem ./src/docker-compose.prod.yml ${{ env.SSH_USERNAME }}@${{ secrets.SERVER_IP }}:./
       - name: Transfer mosquitto config to server
         run: |
           scp -o StrictHostKeyChecking=no -i private_key.pem ./src/mosquitto.conf ${{ env.SSH_USERNAME }}@${{ secrets.SERVER_IP }}:./
