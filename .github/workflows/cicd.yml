@@ -201,7 +201,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: docker-compose
-          path: .
+          path: ./src
 
       - name: Setup SSH Key
         shell: powershell
@@ -212,7 +212,6 @@ jobs:
 
       - name: Transfer docker-compose to server
         run: |
-          ls
           scp -o StrictHostKeyChecking=no -i ./private_key.pem ./src/docker-compose.prod.yml ${{ env.SSH_USERNAME }}@${{ secrets.SERVER_IP }}:./
       - name: Transfer mosquitto config to server
         run: |
