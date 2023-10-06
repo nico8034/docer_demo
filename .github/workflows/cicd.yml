@@ -189,6 +189,7 @@ jobs:
   deploy-application:
     runs-on: self-hosted
     # needs: [build-push-api,build-push-publisher,build-push-subscriber]
+    needs: clone-repository
     continue-on-error: true
     steps:
       - name: Download repository artifact
